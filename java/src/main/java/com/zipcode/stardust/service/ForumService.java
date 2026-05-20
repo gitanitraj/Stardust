@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class ForumService {
@@ -34,6 +36,31 @@ public class ForumService {
               .append(escapeHtml(sf.getTitle())).append("</a>");
         }
         return sb.toString();
+    }
+
+    private static final Pattern YOUTUBE_PATTERN = Pattern.compile(
+        "https?://(?:www\\.)?(?:youtube\\.com/watch\\?v=|youtu\\.be/)([\\w-]+)(?:\\S*)?",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern IMAGE_URL_PATTERN = Pattern.compile(
+        "https?://\\S+\\.(?:jpg|jpeg|png|gif|webp)(?:\\?\\S*)?",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    public String embedMedia(String content) {
+        if (content == null) return "";
+        String escaped = escapeHtml(content);
+        Matcher yt = YOUTUBE_PATTERN.matcher(escaped);
+        String withYoutube = yt.replaceAll(m ->
+            "<iframe width=\"560\" height=\"315\" " +
+            "src=\"https://www.youtube.com/embed/" + m.group(1) + "\" " +
+            "frameborder=\"0\" allowfullscreen></iframe>"
+        );
+        Matcher img = IMAGE_URL_PATTERN.matcher(withYoutube);
+        return img.replaceAll(
+            "<img src=\"$0\" style=\"max-width:100%;display:block;margin:8px 0;\" alt=\"image\">"
+        );
     }
 
     private String escapeHtml(String text) {
