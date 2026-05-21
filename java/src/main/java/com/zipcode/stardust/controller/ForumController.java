@@ -3,6 +3,7 @@ package com.zipcode.stardust.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,6 @@ import com.zipcode.stardust.model.Subforum;
 import com.zipcode.stardust.model.User;
 import com.zipcode.stardust.repository.CommentRepository;
 import com.zipcode.stardust.repository.PostRepository;
-import com.zipcode.stardust.repository.SubforumRepository;
-import com.zipcode.stardust.repository.UserRepository;
-import com.zipcode.stardust.service.ForumService;
 import com.zipcode.stardust.repository.ReactionRepository;
 import com.zipcode.stardust.repository.SubforumRepository;
 import com.zipcode.stardust.repository.UserRepository;
@@ -150,7 +148,7 @@ public class ForumController {
         model.addAttribute("subforum", opt.get());
         model.addAttribute("title", title);
         model.addAttribute("content", content);
-        model.addAttribute("previewHtml", markdownService.convertToHtml(content));
+        model.addAttribute("previewHtml", markdownService.renderMarkdown(content));
         model.addAttribute("isPreview", true);
         model.addAttribute("errors", new ArrayList<>());
         return "createpost";
