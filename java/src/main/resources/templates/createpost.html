@@ -21,7 +21,7 @@
 
         <div class="mb-2">
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('**', '**')">Bold</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('*', '*')">Itlaic</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('*', '*')">Italic</button>
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('#', '')">Heading</button>
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('- ', '')">List</button>
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('[', '](https://example.com)')">Link</button>
@@ -53,7 +53,7 @@
         const textarea = document.getElementById("content"); 
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
-        const selectedText = textarea.value.subsring(start, end);
+        const selectedText = textarea.value.substring(start, end);
 
         const textToInsert = selectedText || "text";
 
@@ -66,11 +66,8 @@
 
         textarea.focus();
 
-        const cursorStart = start + before.length;
-        const cursorEnd = cursorStart + textToInsert.length
-
-        textarea.selectionStart = cursorStart;
-        textarea.selectionEnd = cursorEnd; 
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = start + before.length + textToInsert.length;
     }
 </script>
 </body>
