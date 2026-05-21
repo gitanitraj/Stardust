@@ -10,7 +10,7 @@
             <span sec:authorize="isAuthenticated()">
                 <span class="text-white mr-2" th:text="'Hello, ' + ${currentUser}">Hello, user</span>
                 <a class="nav-link text-white mr-3 d-inline"
-                        th:href="@{'/users/' + ${currentUser}}">
+                        th:href="@{/users/{username}(username=${#authentication.principal.username})}">
                         My Profile
                 </a>
                 <a class="nav-link text-white mr-3 d-inline"
