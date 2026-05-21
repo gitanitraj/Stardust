@@ -18,7 +18,29 @@
         &mdash; <span th:text="${post.timeString}">time</span>
     </p>
     <div class="card mb-4">
-        <div class="card-body" th:utext="${@forumService.embedMedia(post.content)}">Content here</div>
+        <div class="card-body" th:text="${post.content}">Content here</div>
+    </div>
+    <div class="mb-4">
+        <div class="d-flex flex-wrap">
+            <span class="badge badge-pill badge-light mr-2 mb-2"
+                th:each="entry : ${reactionCounts.entrySet()}">
+                <span th:text="${entry.key}">👍</span>
+                <span th:text="${entry.value}">1</span>
+            </span>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="mb-3">
+            <form th:action="@{/action_reaction(post=${post.id})}"
+                method="post"
+                class="d-flex flex-wrap gap-2">
+                <button type="submit" name="emoji" value="👍" class="btn btn-outline-secondary btn-sm">👍</button>
+                <button type="submit" name="emoji" value="👎" class="btn btn-outline-secondary btn-sm">👎</button>
+                <button type="submit" name="emoji" value="❤️" class="btn btn-outline-secondary btn-sm">❤️</button>
+                <button type="submit" name="emoji" value="😂" class="btn btn-outline-secondary btn-sm">😂</button>
+                <button type="submit" name="emoji" value="😮" class="btn btn-outline-secondary btn-sm">😮</button>
+                <button type="submit" name="emoji" value="😢" class="btn btn-outline-secondary btn-sm">😢</button>
+                <button type="submit" name="emoji" value="😡" class="btn btn-outline-secondary btn-sm">😡</button>
+            </form>
+        </div>
     </div>
     <h5>Comments (<span th:text="${#lists.size(comments)}">0</span>)</h5>
     <div th:each="comment : ${comments}" class="comment-block">
