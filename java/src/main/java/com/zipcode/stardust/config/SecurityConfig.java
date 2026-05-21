@@ -1,6 +1,5 @@
 package com.zipcode.stardust.config;
 
-import com.zipcode.stardust.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.zipcode.stardust.repository.UserRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +37,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/subforum", "/loginform", "/viewpost", "/action_login",
                         "/action_createaccount", "/static/**", "/style.css").permitAll()
-                .requestMatchers("/addpost", "/action_post", "/action_comment")
+                .requestMatchers("/addpost", "/action_post", "/action_comment", "/action_reaction")
                         .authenticated()
                 .anyRequest().permitAll()
             )

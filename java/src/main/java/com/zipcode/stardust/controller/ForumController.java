@@ -1,6 +1,7 @@
 package com.zipcode.stardust.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.zipcode.stardust.model.Comment;
 import com.zipcode.stardust.model.Post;
+import com.zipcode.stardust.model.Reaction;
 import com.zipcode.stardust.model.Subforum;
 import com.zipcode.stardust.model.User;
 import com.zipcode.stardust.repository.CommentRepository;
@@ -23,6 +25,12 @@ import com.zipcode.stardust.repository.PostRepository;
 import com.zipcode.stardust.repository.SubforumRepository;
 import com.zipcode.stardust.repository.UserRepository;
 import com.zipcode.stardust.service.ForumService;
+import com.zipcode.stardust.repository.ReactionRepository;
+import com.zipcode.stardust.repository.SubforumRepository;
+import com.zipcode.stardust.repository.UserRepository;
+import com.zipcode.stardust.service.ForumService;
+import com.zipcode.stardust.service.MarkdownService;
+
 
 @Controller
 public class ForumController {
@@ -30,9 +38,12 @@ public class ForumController {
     @Autowired private SubforumRepository subforumRepository;
     @Autowired private PostRepository postRepository;
     @Autowired private CommentRepository commentRepository;
+    @Autowired private ReactionRepository reactionRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private ForumService forumService;
+    @Autowired private MarkdownService markdownService;
+
 
     @Value("${site.name:Schooner}")
     private String siteName;
@@ -127,6 +138,24 @@ public class ForumController {
         return "redirect:/loginform";
     }
 
+    @PostMapping("/preview_post")
+    public String previewPost(@RequestParam Long sub,
+                              @RequestParam String title,
+                              @RequestParam String content,
+                              Model model,
+                              Authentication auth) {
+        addCommonAttributes(model, auth);
+        Optional<Subforum> opt = subforumRepository.findById(sub);
+        if (opt.isEmpty()) return "redirect:/";
+        model.addAttribute("subforum", opt.get());
+        model.addAttribute("title", title);
+        model.addAttribute("content", content);
+        model.addAttribute("previewHtml", markdownService.convertToHtml(content));
+        model.addAttribute("isPreview", true);
+        model.addAttribute("errors", new ArrayList<>());
+        return "createpost";
+    }
+
     @GetMapping("/addpost")
     public String addPostForm(@RequestParam Long sub, Model model, Authentication auth) {
         addCommonAttributes(model, auth);
@@ -182,11 +211,18 @@ public class ForumController {
         List<String> commentHtmlList = comments.stream()
             .map(comment -> markdownService.renderMarkdown(comment.getContent()))
             .toList();
+        List<Reaction> reactions = reactionRepository.findByPost(p);
+        Map<String, Integer> reactionCounts = new HashMap<>();
+        for(Reaction reaction : reactions) {
+            reactionCounts.put(reaction.getEmoji(), reactionCounts.getOrDefault(reaction.getEmoji(), 0) + 1);
+        }
         String breadcrumb = forumService.generateLinkPath(p.getSubforum().getId());
         model.addAttribute("post", p);
         model.addAttribute("postHtml", postHtml);
         model.addAttribute("comments", comments);
         model.addAttribute("commentHtmlList", commentHtmlList); 
+        model.addAttribute("reactions", reactions);
+        model.addAttribute("reactionCounts", reactionCounts);
         model.addAttribute("breadcrumb", breadcrumb);
         model.addAttribute("errors", new ArrayList<>());
         return "viewpost";
@@ -204,6 +240,33 @@ public class ForumController {
         User user = getCurrentUser(auth);
         Comment comment = new Comment(content, user, opt.get());
         commentRepository.save(comment);
+        return "redirect:/viewpost?post=" + post;
+    }
+
+    @PostMapping("/action_reaction")
+    public String addReaction(@RequestParam Long post,
+                                @RequestParam String emoji,
+                                Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/loginform";
+        }
+        Optional<Post> opt = postRepository.findById(post);
+        if (opt.isEmpty()) return "redirect:/";
+        User user = getCurrentUser(auth);
+        Post currentPost = opt.get();
+        Optional<Reaction> existingReaction = reactionRepository.findByUserAndPost(user, currentPost);
+        if(existingReaction.isEmpty()) {
+            Reaction reaction = new Reaction(emoji, user, opt.get());
+            reactionRepository.save(reaction);
+        } else {
+            Reaction reaction = existingReaction.get();
+            if(reaction.getEmoji().equals(emoji)) {
+            reactionRepository.delete(reaction);
+            } else {
+                reaction.setEmoji(emoji);
+                reactionRepository.save(reaction);
+            }
+        }
         return "redirect:/viewpost?post=" + post;
     }
 

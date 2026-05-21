@@ -12,17 +12,45 @@
     </nav>
     <h2 th:text="${post.title}">Post Title</h2>
     <p class="text-muted">
-        Posted by <strong th:text="${post.user.username}">author</strong>
+        Posted by <a th:href="@{'/users/' + ${post.user.username}}"
+            th:text="${post.user.username}"
+            class="text-white font-weight-bold"></a>
         &mdash; <span th:text="${post.timeString}">time</span>
     </p>
     <div class="card mb-4">
         <div class="card-body" th:utext="${postHtml}">Content here</div>
     </div>
+    <div class="mb-4">
+        <div class="d-flex flex-wrap">
+            <span class="badge badge-pill badge-light mr-2 mb-2"
+                th:each="entry : ${reactionCounts.entrySet()}">
+                <span th:text="${entry.key}">👍</span>
+                <span th:text="${entry.value}">1</span>
+            </span>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="mb-3">
+            <form th:action="@{/action_reaction(post=${post.id})}"
+                method="post"
+                class="d-flex flex-wrap gap-2">
+                <button type="submit" name="emoji" value="👍" class="btn btn-outline-secondary btn-sm">👍</button>
+                <button type="submit" name="emoji" value="👎" class="btn btn-outline-secondary btn-sm">👎</button>
+                <button type="submit" name="emoji" value="❤️" class="btn btn-outline-secondary btn-sm">❤️</button>
+                <button type="submit" name="emoji" value="😂" class="btn btn-outline-secondary btn-sm">😂</button>
+                <button type="submit" name="emoji" value="😮" class="btn btn-outline-secondary btn-sm">😮</button>
+                <button type="submit" name="emoji" value="😢" class="btn btn-outline-secondary btn-sm">😢</button>
+                <button type="submit" name="emoji" value="😡" class="btn btn-outline-secondary btn-sm">😡</button>
+            </form>
+        </div>
+    </div>
     <h5>Comments (<span th:text="${#lists.size(comments)}">0</span>)</h5>
     <div th:each="comment, iterStat : ${comments}" class="comment-block">
         <p th:utext="${commentHtmlList[iterStat.index]}">Comment content</p>
+    <div th:each="comment : ${comments}" class="comment-block">
+        <p th:utext="${@forumService.embedMedia(comment.content)}">Comment content</p>
         <small class="text-muted">
-            by <strong th:text="${comment.user.username}">author</strong>
+            by <a th:href="@{'/users/' + ${comment.user.username}}"
+                th:text="${comment.user.username}"
+                class="text-white font-weight-bold"></a>
             &mdash; <span th:text="${comment.timeString}">time</span>
         </small>
     </div>

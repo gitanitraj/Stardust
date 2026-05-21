@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head th:replace="~{layout :: head('Edit Profile')}"></head>
+
+<body>
+<div th:replace="~{header :: header}"></div>
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a th:href="@{'/users/' + ${user.username}}">Profile</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Profile</li>
+        </ol>
+    </nav>
+
+<h2>Edit Profile</h2>
+<form th:action="@{/settings/profile}" method="post" class="mt-3">
+
+    <div class="form-group mb-3">
+        <label for="displayName">Display Name</label>
+        <input id="displayName"
+               type="text"
+               name="displayName"
+               class="form-control"
+               th:value="${user.displayName}">
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="bio">Bio</label>
+        <textarea id="bio"
+                  name="bio"
+                  class="form-control"
+                  rows="5"
+                  th:text="${user.bio}"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+
+<h3 class="mt-5">Avatar</h3>
+
+<form th:action="@{/settings/profile/avatar}"
+      method="post"
+      enctype="multipart/form-data"
+      class="mt-3">
+
+    <div class="form-group mb-3">
+        <label for="avatar">Upload New Avatar</label>
+        <input id="avatar"
+               type="file"
+               name="avatar"
+               class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-secondary">Upload Avatar</button>
+</form>
+<div class="mt-4">
+    <a th:href="@{'/users/' + ${user.username}}">&larr; Back to Profile</a>
+</div>
+</div> <!-- end container -->
+</body>
+</html>
