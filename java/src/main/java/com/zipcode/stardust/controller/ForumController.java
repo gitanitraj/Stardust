@@ -3,6 +3,7 @@ package com.zipcode.stardust.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,7 +148,7 @@ public class ForumController {
         model.addAttribute("subforum", opt.get());
         model.addAttribute("title", title);
         model.addAttribute("content", content);
-        model.addAttribute("previewHtml", markdownService.convertToHtml(content));
+        model.addAttribute("previewHtml", markdownService.renderMarkdown(content));
         model.addAttribute("isPreview", true);
         model.addAttribute("errors", new ArrayList<>());
         return "createpost";
@@ -204,6 +205,10 @@ public class ForumController {
         if (opt.isEmpty()) return "redirect:/";
         Post p = opt.get();
         List<Comment> comments = commentRepository.findByPostOrderByPostdateAsc(p);
+        String postHtml = markdownService.renderMarkdown(p.getContent());
+        List<String> commentHtmlList = comments.stream()
+            .map(comment -> markdownService.renderMarkdown(comment.getContent()))
+            .toList();
         List<Reaction> reactions = reactionRepository.findByPost(p);
         Map<String, Integer> reactionCounts = new HashMap<>();
         for(Reaction reaction : reactions) {
@@ -211,7 +216,9 @@ public class ForumController {
         }
         String breadcrumb = forumService.generateLinkPath(p.getSubforum().getId());
         model.addAttribute("post", p);
+        model.addAttribute("postHtml", postHtml);
         model.addAttribute("comments", comments);
+        model.addAttribute("commentHtmlList", commentHtmlList); 
         model.addAttribute("reactions", reactions);
         model.addAttribute("reactionCounts", reactionCounts);
         model.addAttribute("breadcrumb", breadcrumb);
