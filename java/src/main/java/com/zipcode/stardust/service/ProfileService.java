@@ -36,7 +36,7 @@ public class ProfileService {
         }
 
         // Create a folder inside /static/avatars/
-        String uploadDir = "src/main/resources/static/avatars/";
+        String uploadDir = "avatars/";
         File directory = new File(uploadDir);
         if (!directory.exists()) {
             directory.mkdirs();
@@ -63,5 +63,4 @@ public class ProfileService {
         return null;
     }
 }
-
 }
