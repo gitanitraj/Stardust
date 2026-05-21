@@ -23,6 +23,8 @@ import com.zipcode.stardust.repository.PostRepository;
 import com.zipcode.stardust.repository.SubforumRepository;
 import com.zipcode.stardust.repository.UserRepository;
 import com.zipcode.stardust.service.ForumService;
+import com.zipcode.stardust.service.MarkdownService;
+
 
 @Controller
 public class ForumController {
@@ -33,6 +35,8 @@ public class ForumController {
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private ForumService forumService;
+    @Autowired private MarkdownService markdownService;
+
 
     @Value("${site.name:Schooner}")
     private String siteName;
@@ -139,7 +143,7 @@ public class ForumController {
         model.addAttribute("subforum", opt.get());
         model.addAttribute("title", title);
         model.addAttribute("content", content);
-        model.addAttribute("previewHtml", forumService.embedMedia(content));
+        model.addAttribute("previewHtml", markdownService.convertToHtml(content));
         model.addAttribute("isPreview", true);
         model.addAttribute("errors", new ArrayList<>());
         return "createpost";
