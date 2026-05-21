@@ -1,4 +1,5 @@
 package com.zipcode.stardust.service;
+import java.io.File;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,9 +29,39 @@ public class ProfileService {
         return userRepository.save(user);
     }
 
-    // Optional: handle avatar upload
-    public String saveAvatar(MultipartFile file) {
-        // TODO: implement file validation + save logic
+    public String saveAvatar(MultipartFile file, String username) {
+    try {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        // Create a folder inside /static/avatars/
+        String uploadDir = "src/main/resources/static/avatars/";
+        File directory = new File(uploadDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        // Build a unique filename: username + original extension
+        String originalName = file.getOriginalFilename();
+        String extension = "";
+        if (originalName != null && originalName.contains(".")) {
+            extension = originalName.substring(originalName.lastIndexOf("."));
+        }
+
+        String filename = username + extension;
+        File destination = new File(uploadDir + filename);
+
+        // Save file to disk
+        file.transferTo(destination);
+
+        // Return the URL path used by the browser
+        return "/avatars/" + filename;
+
+    } catch (Exception e) {
+        e.printStackTrace();
         return null;
     }
+}
+
 }

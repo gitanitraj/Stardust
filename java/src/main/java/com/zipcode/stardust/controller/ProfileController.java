@@ -1,5 +1,7 @@
 package com.zipcode.stardust.controller;
 
+import java.security.Principal;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.zipcode.stardust.model.User;
+import com.zipcode.stardust.repository.UserRepository;
 import com.zipcode.stardust.service.ProfileService;
 
 
@@ -18,8 +21,11 @@ import com.zipcode.stardust.service.ProfileService;
 public class ProfileController {
 
     private final ProfileService profileService;
+    private final UserRepository userRepository;
 
-    public ProfileController(ProfileService profileService) {
+    public ProfileController(UserRepository userRepository,
+                             ProfileService profileService) {
+        this.userRepository = userRepository;
         this.profileService = profileService;
     }
 
@@ -57,18 +63,27 @@ public class ProfileController {
 
     // POST /settings/profile/avatar
     @PostMapping("/settings/profile/avatar")
-    public String uploadAvatar(@AuthenticationPrincipal UserDetails currentUser,
-                               @RequestParam("avatar") MultipartFile file) {
+    public String uploadAvatar(@RequestParam("avatar") MultipartFile file,
+                           Principal principal) {
 
-        User user = profileService.getUserProfile(currentUser.getUsername());
-        String avatarUrl = profileService.saveAvatar(file);
-
-        if (avatarUrl != null) {
-            user.setAvatarUrl(avatarUrl);
-            profileService.updateProfile(user, user.getDisplayName(), user.getBio());
+        // Load the current user
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user == null) {
+            return "redirect:/loginform";
         }
 
-        return "redirect:/users/" + user.getUsername();
-    }
+        // Save the avatar file and get the URL
+        String avatarUrl = profileService.saveAvatar(file, user.getUsername());
+
+        // Only update if the upload succeeded
+        if (avatarUrl != null) {
+            user.setAvatarUrl(avatarUrl);
+            userRepository.save(user);
+        }
+
+        // Redirect back to the edit page
+        return "redirect:/settings/profile";
+        }
+
 }
 
