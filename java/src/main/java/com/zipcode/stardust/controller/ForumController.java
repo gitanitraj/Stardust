@@ -22,6 +22,9 @@ import com.zipcode.stardust.model.Subforum;
 import com.zipcode.stardust.model.User;
 import com.zipcode.stardust.repository.CommentRepository;
 import com.zipcode.stardust.repository.PostRepository;
+import com.zipcode.stardust.repository.SubforumRepository;
+import com.zipcode.stardust.repository.UserRepository;
+import com.zipcode.stardust.service.ForumService;
 import com.zipcode.stardust.repository.ReactionRepository;
 import com.zipcode.stardust.repository.SubforumRepository;
 import com.zipcode.stardust.repository.UserRepository;
@@ -204,6 +207,10 @@ public class ForumController {
         if (opt.isEmpty()) return "redirect:/";
         Post p = opt.get();
         List<Comment> comments = commentRepository.findByPostOrderByPostdateAsc(p);
+        String postHtml = markdownService.renderMarkdown(p.getContent());
+        List<String> commentHtmlList = comments.stream()
+            .map(comment -> markdownService.renderMarkdown(comment.getContent()))
+            .toList();
         List<Reaction> reactions = reactionRepository.findByPost(p);
         Map<String, Integer> reactionCounts = new HashMap<>();
         for(Reaction reaction : reactions) {
@@ -211,7 +218,9 @@ public class ForumController {
         }
         String breadcrumb = forumService.generateLinkPath(p.getSubforum().getId());
         model.addAttribute("post", p);
+        model.addAttribute("postHtml", postHtml);
         model.addAttribute("comments", comments);
+        model.addAttribute("commentHtmlList", commentHtmlList); 
         model.addAttribute("reactions", reactions);
         model.addAttribute("reactionCounts", reactionCounts);
         model.addAttribute("breadcrumb", breadcrumb);
