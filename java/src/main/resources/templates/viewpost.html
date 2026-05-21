@@ -43,17 +43,16 @@
         </div>
     </div>
     <h5>Comments (<span th:text="${#lists.size(comments)}">0</span>)</h5>
-    <div th:each="comment, iterStat : ${comments}" class="comment-block">
-        <p th:utext="${commentHtmlList[iterStat.index]}">Comment content</p>
-    <div th:each="comment : ${comments}" class="comment-block">
-        <p th:utext="${@forumService.embedMedia(comment.content)}">Comment content</p>
-        <small class="text-muted">
-            by <a th:href="@{'/users/' + ${comment.user.username}}"
-                th:text="${comment.user.username}"
-                class="text-white font-weight-bold"></a>
-            &mdash; <span th:text="${comment.timeString}">time</span>
-        </small>
-    </div>
+
+<div th:each="comment, iterStat : ${comments}" class="comment-block">
+    <p th:utext="${commentHtmlList[iterStat.index]}">Comment content</p>
+    <small class="text-muted">
+        by <a th:href="@{'/users/' + ${comment.user.username}}"
+              th:text="${comment.user.username}"
+              class="text-white font-weight-bold"></a>
+        &mdash; <span th:text="${comment.timeString}">time</span>
+    </small>
+</div>
     <div th:if="${comments.isEmpty()}" class="text-muted">No comments yet.</div>
     <div sec:authorize="isAuthenticated()" class="mt-4">
         <h5>Add a Comment</h5>
@@ -67,6 +66,9 @@
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('`', '`')">Code</button>
         </div>
         <form method="post">
+            <input type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}"/>
             <div class="form-group">
                 <textarea id="commentContent"
                             name="content"
@@ -77,8 +79,16 @@
                             th:text="${commentContent}"></textarea>
             </div>
             <button type="submit"
-                    th:formaction="@{/preview_comment(post=${post.id})}"
-                    class="btn btn-secondary">Preview</button>
+        th:formaction="@{/action_comment(post=${post.id})}"
+        class="btn btn-primary">
+    Submit Comment
+</button>
+
+<button type="submit"
+        th:formaction="@{/preview_comment(post=${post.id})}"
+        class="btn btn-secondary">
+    Preview
+</button>
         </form>
         <div th:if="${isCommentPreview}" class="mt-3">
             <h6>Preview</h6>
