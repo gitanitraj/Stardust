@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${profileUser.username} + ' Profile'">Profile</title>
+</head>
+
+<body>
+<h1 th:text="${profileUser.displayName != null ? profileUser.displayName : profileUser.username}"></h1>
+<img th:if="${profileUser.avatarUrl != null}"
+     th:src="@{${profileUser.avatarUrl}}"
+     alt="Avatar"
+     width="120"
+     height="120"
+     style="border-radius: 50%;">
+<div>
+    <h3>About Me</h3>
+    <p th:text="${profileUser.bio != null ? profileUser.bio : 'This user has not added a bio yet.'}"></p>
+</div>
+<div>
+    <small>Joined on:
+        <span th:text="${#temporals.format(profileUser.createdAt, 'MMMM dd, yyyy')}"></span>
+    </small>
+</div>
+<div>
+    <h3>Recent Posts</h3>
+
+    <ul>
+        <li th:each="post : ${profileUser.posts}">
+            <a th:href="@{'/posts/' + ${post.id}}"
+               th:text="${post.title}"></a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
+

@@ -1,5 +1,6 @@
 package com.zipcode.stardust.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +44,18 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
+
+    @Column(nullable = true, length = 50)
+    private String displayName;
+
+    @Column(nullable = true, length = 500)
+    private String bio;
+
+    @Column(nullable = true)
+    private String avatarUrl;
+
+    @Column(nullable = false)
+    private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
 
     public User() {}
 
@@ -102,4 +115,17 @@ public class User implements UserDetails {
     public void setPosts(List<Post> posts) { this.posts = posts; }
     public List<Comment> getComments() { return comments; }
     public void setComments(List<Comment> comments) { this.comments = comments; }
+
+    public String getDisplayName() { return displayName; }
+    public void setDisplayName(String displayName) { this.displayName = displayName; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
 }

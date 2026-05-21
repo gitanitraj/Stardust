@@ -35,7 +35,9 @@
             <div class="d-flex justify-content-between">
                 <strong th:text="${post.title}">Post Title</strong>
                 <small class="text-muted">
-                    <span th:text="${post.timeString}">time</span>
+                    <a th:href="@{'/users/' + ${post.user.username}}"
+                        th:text="${post.user.username}"
+                        class="text-white font-weight-bold"></a>
                     by <span th:text="${post.user.username}">author</span>
                 </small>
             </div>

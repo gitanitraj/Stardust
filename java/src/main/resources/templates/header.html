@@ -9,6 +9,15 @@
             <a class="nav-link text-white mr-3" th:href="@{/}">Subforum Index</a>
             <span sec:authorize="isAuthenticated()">
                 <span class="text-white mr-2" th:text="'Hello, ' + ${currentUser}">Hello, user</span>
+                <a class="nav-link text-white mr-3 d-inline"
+                        th:href="@{'/users/' + ${currentUser}}">
+                        My Profile
+                </a>
+                <a class="nav-link text-white mr-3 d-inline"
+                        th:href="@{/settings/profile}">
+                        Edit Profile
+                </a>
+
                 <form th:action="@{/action_logout}" method="post" class="d-inline">
                     <button type="submit" class="btn btn-link nav-link text-white d-inline p-0">Logout</button>
                 </form>
