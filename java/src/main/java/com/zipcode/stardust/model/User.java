@@ -45,6 +45,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Reaction> reactions = new ArrayList<>();
+
     @Column(nullable = true, length = 50)
     private String displayName;
 
@@ -127,5 +130,7 @@ public class User implements UserDetails {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public List<Reaction> getReactions() { return reactions; }
+    public void setReactions(List<Reaction> reactions) { this.reactions = reactions; }
 
 }
