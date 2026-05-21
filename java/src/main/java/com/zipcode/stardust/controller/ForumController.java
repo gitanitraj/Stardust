@@ -1,19 +1,28 @@
 package com.zipcode.stardust.controller;
 
-import com.zipcode.stardust.model.*;
-import com.zipcode.stardust.repository.*;
-import com.zipcode.stardust.service.ForumService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.zipcode.stardust.model.Comment;
+import com.zipcode.stardust.model.Post;
+import com.zipcode.stardust.model.Subforum;
+import com.zipcode.stardust.model.User;
+import com.zipcode.stardust.repository.CommentRepository;
+import com.zipcode.stardust.repository.PostRepository;
+import com.zipcode.stardust.repository.SubforumRepository;
+import com.zipcode.stardust.repository.UserRepository;
+import com.zipcode.stardust.service.ForumService;
 
 @Controller
 public class ForumController {
@@ -116,6 +125,24 @@ public class ForumController {
         User user = new User(email, username, password, passwordEncoder);
         userRepository.save(user);
         return "redirect:/loginform";
+    }
+
+    @PostMapping("/preview_post")
+    public String previewPost(@RequestParam Long sub,
+                              @RequestParam String title,
+                              @RequestParam String content,
+                              Model model,
+                              Authentication auth) {
+        addCommonAttributes(model, auth);
+        Optional<Subforum> opt = subforumRepository.findById(sub);
+        if (opt.isEmpty()) return "redirect:/";
+        model.addAttribute("subforum", opt.get());
+        model.addAttribute("title", title);
+        model.addAttribute("content", content);
+        model.addAttribute("previewHtml", forumService.embedMedia(content));
+        model.addAttribute("isPreview", true);
+        model.addAttribute("errors", new ArrayList<>());
+        return "createpost";
     }
 
     @GetMapping("/addpost")
