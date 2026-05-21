@@ -8,7 +8,11 @@
         <div class="navbar-nav flex-row">
             <a class="nav-link text-white mr-3" th:href="@{/}">Subforum Index</a>
             <span sec:authorize="isAuthenticated()">
-                <span class="text-white mr-2" th:text="'Hello, ' + ${currentUser}">Hello, user</span>
+                <span class="text-white mr-2"
+                    th:text="'Hello, ' + ${#authentication.principal.displayName}">
+                    Hello, user
+                </span>
+
                 <a class="nav-link text-white mr-3 d-inline"
                         th:href="@{/users/{username}(username=${#authentication.principal.username})}">
                         My Profile
