@@ -1,19 +1,28 @@
 package com.zipcode.stardust.controller;
 
-import com.zipcode.stardust.model.*;
-import com.zipcode.stardust.repository.*;
-import com.zipcode.stardust.service.ForumService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.zipcode.stardust.model.Comment;
+import com.zipcode.stardust.model.Post;
+import com.zipcode.stardust.model.Subforum;
+import com.zipcode.stardust.model.User;
+import com.zipcode.stardust.repository.CommentRepository;
+import com.zipcode.stardust.repository.PostRepository;
+import com.zipcode.stardust.repository.SubforumRepository;
+import com.zipcode.stardust.repository.UserRepository;
+import com.zipcode.stardust.service.ForumService;
 
 @Controller
 public class ForumController {
@@ -169,9 +178,15 @@ public class ForumController {
         if (opt.isEmpty()) return "redirect:/";
         Post p = opt.get();
         List<Comment> comments = commentRepository.findByPostOrderByPostdateAsc(p);
+        String postHtml = markdownService.renderMarkdown(p.getContent());
+        List<String> commentHtmlList = comments.stream()
+            .map(comment -> markdownService.renderMarkdown(comment.getContent()))
+            .toList();
         String breadcrumb = forumService.generateLinkPath(p.getSubforum().getId());
         model.addAttribute("post", p);
+        model.addAttribute("postHtml", postHtml);
         model.addAttribute("comments", comments);
+        model.addAttribute("commentHtmlList", commentHtmlList); 
         model.addAttribute("breadcrumb", breadcrumb);
         model.addAttribute("errors", new ArrayList<>());
         return "viewpost";
