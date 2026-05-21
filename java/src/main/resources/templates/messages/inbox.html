@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Inbox</title>
+</head>
+
+<body>
+
+    <h1>Inbox</h1>
+
+    <a href="/messages/compose">Compose Message</a> |
+    <a href="/messages/sent">Sent Messages</a> |
+    <a href="/">Home</a>
+
+    <hr>
+
+    <div th:if="${messages.isEmpty()}">
+        <p>No messages in your inbox.</p>
+    </div>
+
+    <div th:each="message : ${messages}">
+        <p>
+            <strong>From:</strong>
+            <span th:text="${message.sender.username}"></span>
+        </p>
+
+        <p>
+            <strong>Subject:</strong>
+            <a th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}"></a>
+        </p>
+
+        <p>
+            <strong>Sent:</strong>
+            <span th:text="${message.sentAt}"></span>
+        </p>
+
+        <p th:if="${!message.readStatus}">
+            <strong>Unread</strong>
+        </p>
+
+        <hr>
+    </div>
+
+</body>
+
+</html>
