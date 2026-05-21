@@ -36,7 +36,7 @@ public class ProfileService {
         }
 
         // Create a folder inside /static/avatars/
-        String uploadDir = "avatars/";
+        String uploadDir = System.getProperty("user.dir") + "/avatars/";
         File directory = new File(uploadDir);
         if (!directory.exists()) {
             directory.mkdirs();
