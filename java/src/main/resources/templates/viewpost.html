@@ -99,6 +99,9 @@
                             th:text="${commentContent}"></textarea>
             </div>
             <button type="submit"
+                    th:formaction="@{/action_comment(post=${post.id})}"
+                    class="btn btn-primary">Submit Comment</button>
+            <button type="submit"
                     th:formaction="@{/preview_comment(post=${post.id})}"
                     class="btn btn-secondary">Preview</button>
         </form>

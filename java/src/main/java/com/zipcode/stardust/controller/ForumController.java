@@ -301,4 +301,45 @@ public class ForumController {
     public String addCommentGet(@RequestParam Long post) {
         return "redirect:/viewpost?post=" + post;
     }
+
+    @PostMapping("/preview_comment")
+    public String previewComment(@RequestParam Long post,
+                                 @RequestParam String content,
+                                 Model model,
+                                 Authentication auth) {
+        addCommonAttributes(model, auth);
+
+        Optional<Post> opt = postRepository.findById(post);
+        if (opt.isEmpty()) return "redirect:/";
+
+        Post p = opt.get();
+        List<Comment> comments = commentRepository.findByPostOrderByPostdateAsc(p);
+        List<Reaction> reactions = reactionRepository.findByPost(p);
+
+        Map<String, Integer> reactionCounts = new HashMap<>();
+        for (Reaction reaction : reactions) {
+            reactionCounts.put(
+                reaction.getEmoji(),
+                reactionCounts.getOrDefault(reaction.getEmoji(), 0) + 1
+            );
+        }
+
+        List<String> commentHtmlList = comments.stream()
+                .map(comment -> markdownService.renderMarkdown(comment.getContent()))
+                .toList();
+
+        model.addAttribute("post", p);
+        model.addAttribute("postHtml", markdownService.renderMarkdown(p.getContent()));
+        model.addAttribute("comments", comments);
+        model.addAttribute("commentHtmlList", commentHtmlList);
+        model.addAttribute("breadcrumb", forumService.generateLinkPath(p.getSubforum().getId()));
+        model.addAttribute("errors", new ArrayList<>());
+        model.addAttribute("commentContent", content);
+        model.addAttribute("commentPreviewHtml", markdownService.renderMarkdown(content));
+        model.addAttribute("isCommentPreview", true);
+        model.addAttribute("reactions", reactions);
+        model.addAttribute("reactionCounts", reactionCounts);
+
+        return "viewpost";
+    }
 }
