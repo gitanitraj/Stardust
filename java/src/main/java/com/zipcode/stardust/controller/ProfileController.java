@@ -65,8 +65,6 @@ public class ProfileController {
     @PostMapping("/settings/profile/avatar")
     public String uploadAvatar(@RequestParam("avatar") MultipartFile file,
                            Principal principal) {
-        System.out.println("DEBUG — file empty? " + file.isEmpty());
-        System.out.println("DEBUG — original filename: " + file.getOriginalFilename());
 
         // Load the current user
         User user = userRepository.findByUsername(principal.getName()).orElse(null);
