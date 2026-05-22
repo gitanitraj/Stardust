@@ -39,6 +39,8 @@ public class SecurityConfig {
                         "/action_createaccount", "/static/**", "/style.css").permitAll()
                 .requestMatchers("/addpost", "/action_post", "/action_comment", "/action_reaction")
                         .authenticated()
+                .requestMatchers("/action_deletepost", "/action_deletecomment", "/action_lockthread")
+                        .hasRole("ADMIN")
                 .anyRequest().permitAll()
             )
             .formLogin(form -> form

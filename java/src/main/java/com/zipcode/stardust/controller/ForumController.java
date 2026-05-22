@@ -235,9 +235,38 @@ public class ForumController {
         }
         Optional<Post> opt = postRepository.findById(post);
         if (opt.isEmpty()) return "redirect:/";
+        if (opt.get().isLocked()) return "redirect:/viewpost?post=" + post;
         User user = getCurrentUser(auth);
         Comment comment = new Comment(content, user, opt.get());
         commentRepository.save(comment);
+        return "redirect:/viewpost?post=" + post;
+    }
+
+    @PostMapping("/action_deletepost")
+    public String deletePost(@RequestParam Long post) {
+        Optional<Post> opt = postRepository.findById(post);
+        if (opt.isEmpty()) return "redirect:/";
+        Long subId = opt.get().getSubforum().getId();
+        postRepository.delete(opt.get());
+        return "redirect:/subforum?sub=" + subId;
+    }
+
+    @PostMapping("/action_deletecomment")
+    public String deleteComment(@RequestParam Long comment) {
+        Optional<Comment> opt = commentRepository.findById(comment);
+        if (opt.isEmpty()) return "redirect:/";
+        Long postId = opt.get().getPost().getId();
+        commentRepository.delete(opt.get());
+        return "redirect:/viewpost?post=" + postId;
+    }
+
+    @PostMapping("/action_lockthread")
+    public String lockThread(@RequestParam Long post) {
+        Optional<Post> opt = postRepository.findById(post);
+        if (opt.isEmpty()) return "redirect:/";
+        Post p = opt.get();
+        p.setLocked(!p.isLocked());
+        postRepository.save(p);
         return "redirect:/viewpost?post=" + post;
     }
 
