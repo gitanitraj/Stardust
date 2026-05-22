@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Compose Message</title>
+</head>
+
+<body>
+
+    <h1>Compose Message</h1>
+
+    <a href="/messages/inbox">Inbox</a> |
+    <a href="/messages/sent">Sent Messages</a> |
+    <a href="/">Home</a>
+
+    <hr>
+
+    <form method="post" action="/messages/compose">
+
+        <label>Receiver Username:</label><br>
+        <input type="text" name="receiverUsername" required><br><br>
+
+        <label>Subject:</label><br>
+        <input type="text" name="subject" required><br><br>
+
+        <label>Message:</label><br>
+        <textarea name="body" rows="8" cols="50" required></textarea><br><br>
+
+        <button type="submit">Send Message</button>
+
+    </form>
+
+</body>
+
+</html>

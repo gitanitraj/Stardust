@@ -137,7 +137,7 @@ public class ForumController {
     }
 
     @PostMapping("/preview_post")
-    public String previewPost(@RequestParam Long sub,
+    public String previewPost(@RequestParam long sub,
                               @RequestParam String title,
                               @RequestParam String content,
                               Model model,
