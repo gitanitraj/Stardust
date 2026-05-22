@@ -235,9 +235,38 @@ public class ForumController {
         }
         Optional<Post> opt = postRepository.findById(post);
         if (opt.isEmpty()) return "redirect:/";
+        if (opt.get().isLocked()) return "redirect:/viewpost?post=" + post;
         User user = getCurrentUser(auth);
         Comment comment = new Comment(content, user, opt.get());
         commentRepository.save(comment);
+        return "redirect:/viewpost?post=" + post;
+    }
+
+    @PostMapping("/action_deletepost")
+    public String deletePost(@RequestParam Long post) {
+        Optional<Post> opt = postRepository.findById(post);
+        if (opt.isEmpty()) return "redirect:/";
+        Long subId = opt.get().getSubforum().getId();
+        postRepository.delete(opt.get());
+        return "redirect:/subforum?sub=" + subId;
+    }
+
+    @PostMapping("/action_deletecomment")
+    public String deleteComment(@RequestParam Long comment) {
+        Optional<Comment> opt = commentRepository.findById(comment);
+        if (opt.isEmpty()) return "redirect:/";
+        Long postId = opt.get().getPost().getId();
+        commentRepository.delete(opt.get());
+        return "redirect:/viewpost?post=" + postId;
+    }
+
+    @PostMapping("/action_lockthread")
+    public String lockThread(@RequestParam Long post) {
+        Optional<Post> opt = postRepository.findById(post);
+        if (opt.isEmpty()) return "redirect:/";
+        Post p = opt.get();
+        p.setLocked(!p.isLocked());
+        postRepository.save(p);
         return "redirect:/viewpost?post=" + post;
     }
 
@@ -274,46 +303,43 @@ public class ForumController {
     }
 
     @PostMapping("/preview_comment")
-public String previewComment(@RequestParam Long post,
-                             @RequestParam String content,
-                             Model model,
-                             Authentication auth) {
-    addCommonAttributes(model, auth);
+    public String previewComment(@RequestParam Long post,
+                                 @RequestParam String content,
+                                 Model model,
+                                 Authentication auth) {
+        addCommonAttributes(model, auth);
 
-    Optional<Post> opt = postRepository.findById(post);
-    if (opt.isEmpty()) return "redirect:/";
+        Optional<Post> opt = postRepository.findById(post);
+        if (opt.isEmpty()) return "redirect:/";
 
-    Post p = opt.get();
-    List<Comment> comments = commentRepository.findByPostOrderByPostdateAsc(p);
+        Post p = opt.get();
+        List<Comment> comments = commentRepository.findByPostOrderByPostdateAsc(p);
+        List<Reaction> reactions = reactionRepository.findByPost(p);
 
-    List<Reaction> reactions = reactionRepository.findByPost(p);
+        Map<String, Integer> reactionCounts = new HashMap<>();
+        for (Reaction reaction : reactions) {
+            reactionCounts.put(
+                reaction.getEmoji(),
+                reactionCounts.getOrDefault(reaction.getEmoji(), 0) + 1
+            );
+        }
 
-Map<String, Integer> reactionCounts = new HashMap<>();
-for (Reaction reaction : reactions) {
-    reactionCounts.put(
-        reaction.getEmoji(),
-        reactionCounts.getOrDefault(reaction.getEmoji(), 0) + 1
-        );
+        List<String> commentHtmlList = comments.stream()
+                .map(comment -> markdownService.renderMarkdown(comment.getContent()))
+                .toList();
+
+        model.addAttribute("post", p);
+        model.addAttribute("postHtml", markdownService.renderMarkdown(p.getContent()));
+        model.addAttribute("comments", comments);
+        model.addAttribute("commentHtmlList", commentHtmlList);
+        model.addAttribute("breadcrumb", forumService.generateLinkPath(p.getSubforum().getId()));
+        model.addAttribute("errors", new ArrayList<>());
+        model.addAttribute("commentContent", content);
+        model.addAttribute("commentPreviewHtml", markdownService.renderMarkdown(content));
+        model.addAttribute("isCommentPreview", true);
+        model.addAttribute("reactions", reactions);
+        model.addAttribute("reactionCounts", reactionCounts);
+
+        return "viewpost";
     }
-
-    model.addAttribute("post", p);
-    model.addAttribute("postHtml", markdownService.renderMarkdown(p.getContent()));
-    model.addAttribute("comments", comments);
-
-    List<String> commentHtmlList = comments.stream()
-            .map(comment -> markdownService.renderMarkdown(comment.getContent()))
-            .toList();
-
-    model.addAttribute("commentHtmlList", commentHtmlList);
-    model.addAttribute("breadcrumb", forumService.generateLinkPath(p.getSubforum().getId()));
-    model.addAttribute("errors", new ArrayList<>());
-
-    model.addAttribute("commentContent", content);
-    model.addAttribute("commentPreviewHtml", markdownService.renderMarkdown(content));
-    model.addAttribute("isCommentPreview", true);
-    model.addAttribute("reactions", reactions);
-    model.addAttribute("reactionCounts", reactionCounts);
-
-    return "viewpost";
-}
 }

@@ -10,12 +10,25 @@
             <li class="breadcrumb-item"><span th:utext="${breadcrumb}">path</span></li>
         </ol>
     </nav>
-    <h2 th:text="${post.title}">Post Title</h2>
+    <div class="d-flex justify-content-between align-items-start">
+        <h2 th:text="${post.title}">Post Title</h2>
+        <div sec:authorize="hasRole('ADMIN')" class="ml-3">
+            <form th:action="@{/action_lockthread(post=${post.id})}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-warning"
+                        th:text="${post.locked} ? 'Unlock Thread' : 'Lock Thread'">Lock Thread</button>
+            </form>
+            <form th:action="@{/action_deletepost(post=${post.id})}" method="post" class="d-inline ml-1"
+                  onsubmit="return confirm('Delete this post and all its comments?')">
+                <button type="submit" class="btn btn-sm btn-danger">Delete Post</button>
+            </form>
+        </div>
+    </div>
     <p class="text-muted">
         Posted by <a th:href="@{'/users/' + ${post.user.username}}"
             th:text="${post.user.username}"
             class="text-white font-weight-bold"></a>
         &mdash; <span th:text="${post.timeString}">time</span>
+        <span th:if="${post.locked}" class="badge badge-secondary ml-2">🔒 Locked</span>
     </p>
     <div class="card mb-4">
         <div class="card-body" th:utext="${postHtml}">Content here</div>
@@ -43,18 +56,28 @@
         </div>
     </div>
     <h5>Comments (<span th:text="${#lists.size(comments)}">0</span>)</h5>
-
-<div th:each="comment, iterStat : ${comments}" class="comment-block">
-    <p th:utext="${commentHtmlList[iterStat.index]}">Comment content</p>
-    <small class="text-muted">
-        by <a th:href="@{'/users/' + ${comment.user.username}}"
-              th:text="${comment.user.username}"
-              class="text-white font-weight-bold"></a>
-        &mdash; <span th:text="${comment.timeString}">time</span>
-    </small>
-</div>
+    <div th:each="comment, iterStat : ${comments}" class="comment-block">
+        <p th:utext="${commentHtmlList[iterStat.index]}">Comment content</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                by <a th:href="@{'/users/' + ${comment.user.username}}"
+                    th:text="${comment.user.username}"
+                    class="text-white font-weight-bold"></a>
+                &mdash; <span th:text="${comment.timeString}">time</span>
+            </small>
+            <div sec:authorize="hasRole('ADMIN')">
+                <form th:action="@{/action_deletecomment(comment=${comment.id})}" method="post" class="d-inline"
+                      onsubmit="return confirm('Delete this comment?')">
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
     <div th:if="${comments.isEmpty()}" class="text-muted">No comments yet.</div>
-    <div sec:authorize="isAuthenticated()" class="mt-4">
+    <div th:if="${post.locked}" class="mt-4 alert alert-secondary">
+        🔒 This thread is locked. No new comments can be posted.
+    </div>
+    <div sec:authorize="isAuthenticated()" th:unless="${post.locked}" class="mt-4">
         <h5>Add a Comment</h5>
 
         <div class="mb-2">
@@ -79,16 +102,11 @@
                             th:text="${commentContent}"></textarea>
             </div>
             <button type="submit"
-        th:formaction="@{/action_comment(post=${post.id})}"
-        class="btn btn-primary">
-    Submit Comment
-</button>
-
-<button type="submit"
-        th:formaction="@{/preview_comment(post=${post.id})}"
-        class="btn btn-secondary">
-    Preview
-</button>
+                    th:formaction="@{/action_comment(post=${post.id})}"
+                    class="btn btn-primary">Submit Comment</button>
+            <button type="submit"
+                    th:formaction="@{/preview_comment(post=${post.id})}"
+                    class="btn btn-secondary">Preview</button>
         </form>
         <div th:if="${isCommentPreview}" class="mt-3">
             <h6>Preview</h6>
