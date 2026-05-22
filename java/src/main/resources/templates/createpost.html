@@ -15,16 +15,60 @@
         <div class="form-group">
             <label>Title</label>
             <input type="text" name="title" class="form-control" required
-                   minlength="5" maxlength="139"/>
+                   minlength="5" maxlength="139"
+                   th:value="${title}"/>
+        </div>
+
+        <div class="mb-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('**', '**')">Bold</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('*', '*')">Italic</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('#', '')">Heading</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('- ', '')">List</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('[', '](https://example.com)')">Link</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertMarkdown('`', '`')">Code</button>
         </div>
         <div class="form-group">
             <label>Content</label>
-            <textarea name="content" class="form-control" rows="8" required
-                      minlength="11" maxlength="4999"></textarea>
+            <textarea id ="content" name="content" class="form-control" rows="8" required
+                      minlength="11" maxlength="4999"
+                      th:text="${content}"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Post</button>
+        <button type="submit" 
+                th:formaction="@{/action_post(sub=${subforum.id})}"
+                class="btn btn-primary">Post</button>
+        <button type="submit"
+                th:formaction="@{/preview_post(sub=${subforum.id})}"
+                class="btn btn-secondary">Preview</button>
         <a th:href="@{/subforum(sub=${subforum.id})}" class="btn btn-secondary ml-2">Cancel</a>
     </form>
+    <div th:if="${isPreview}" class="mt-4">
+        <h4>Preview</h4>
+        <div class="card">
+            <div class="card-body" th:utext="${previewHtml}"></div>
+        </div>
+    </div>
 </div>
+<script>
+    function insertMarkdown(before, after) {
+        const textarea = document.getElementById("content"); 
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = textarea.value.substring(start, end);
+
+        const textToInsert = selectedText || "text";
+
+        const replacement = before + textToInsert + after; 
+
+        textarea.value = 
+            textarea.value.substring(0, start) +
+            replacement +
+            textarea.value.substring(end); 
+
+        textarea.focus();
+
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = start + before.length + textToInsert.length;
+    }
+</script>
 </body>
 </html>
