@@ -42,6 +42,9 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime postdate;
 
+    @Column(nullable = false)
+    private boolean locked = false;
+
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
@@ -109,4 +112,6 @@ public class Post {
     public void setComments(List<Comment> comments) { this.comments = comments; }
     public List<Reaction> getReactions() { return reactions; }
     public void setReactions(List<Reaction> reactions) { this.reactions = reactions; }
+    public boolean isLocked() { return locked; }
+    public void setLocked(boolean locked) { this.locked = locked; }
 }
