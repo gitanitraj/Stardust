@@ -3,44 +3,100 @@
 
 <head>
     <title>View Message</title>
+    <style>
+        body {
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .messages-container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 25px;
+        }
+
+        .message-detail-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .message-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .message-nav a {
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #343a40;
+            color: white;
+            font-weight: bold;
+        }
+
+        .message-nav a:hover {
+            background: #0d6efd;
+        }
+
+        .message-title {
+            font-size: 32px;
+            color: #222;
+            margin-bottom: 20px;
+        }
+
+        .message-meta {
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .message-body {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            line-height: 1.6;
+            color: #333;
+        }
+    </style>
 </head>
 
 <body>
 
     <div th:replace="header :: header"></div>
 
-    <div class="container mt-4">
+    <div class="messages-container">
 
-        <h1 th:text="${message.subject}">Message Subject</h1>
+        <div class="message-nav">
+            <a href="/messages/inbox">Inbox</a>
+            <a href="/messages/sent">Sent</a>
+            <a href="/messages/compose">Compose</a>
+        </div>
 
-        <p>
-            <a href="/messages/inbox">Inbox</a> |
-            <a href="/messages/sent">Sent Messages</a> |
-            <a href="/messages/compose">Compose Message</a>
-        </p>
+        <div class="message-detail-card">
+            <h1 class="message-title" th:text="${message.subject}">Message Subject</h1>
 
-        <hr>
+            <p class="message-meta">
+                <strong>From:</strong>
+                <span th:text="${message.sender.username}">sender</span>
+            </p>
 
-        <p>
-            <strong>From:</strong>
-            <span th:text="${message.sender.username}">sender</span>
-        </p>
+            <p class="message-meta">
+                <strong>To:</strong>
+                <span th:text="${message.receiver.username}">receiver</span>
+            </p>
 
-        <p>
-            <strong>To:</strong>
-            <span th:text="${message.receiver.username}">receiver</span>
-        </p>
+            <p class="message-meta">
+                <strong>Sent:</strong>
+                <span th:text="${message.sentAt}">date time</span>
+            </p>
 
-        <p>
-            <strong>Sent:</strong>
-            <span th:text="${message.sentAt}">date time</span>
-        </p>
-
-        <hr>
-
-        <h3>Message</h3>
-
-        <p th:text="${message.body}">message body</p>
+            <div class="message-body">
+                <p th:text="${message.body}">message body</p>
+            </div>
+        </div>
 
     </div>
 
