@@ -7,33 +7,42 @@
 
 <body>
 
-    <h1 th:text="${message.subject}">Message Subject</h1>
+    <div th:replace="header :: header"></div>
 
-    <a href="/messages/inbox">Inbox</a> |
-    <a href="/messages/sent">Sent Messages</a> |
-    <a href="/messages/compose">Compose Message</a> |
-    <a href="/">Home</a>
+    <div class="container mt-4">
 
-    <hr>
+        <h1 th:text="${message.subject}">Message Subject</h1>
 
-    <p>
-        <strong>From:</strong>
-        <span th:text="${message.sender.username}"></span>
-    </p>
+        <p>
+            <a href="/messages/inbox">Inbox</a> |
+            <a href="/messages/sent">Sent Messages</a> |
+            <a href="/messages/compose">Compose Message</a>
+        </p>
 
-    <p>
-        <strong>To:</strong>
-        <span th:text="${message.receiver.username}"></span>
-    </p>
+        <hr>
 
-    <p>
-        <strong>Sent:</strong>
-        <span th:text="${message.sentAt}"></span>
-    </p>
+        <p>
+            <strong>From:</strong>
+            <span th:text="${message.sender.username}">sender</span>
+        </p>
 
-    <hr>
+        <p>
+            <strong>To:</strong>
+            <span th:text="${message.receiver.username}">receiver</span>
+        </p>
 
-    <p th:text="${message.body}"></p>
+        <p>
+            <strong>Sent:</strong>
+            <span th:text="${message.sentAt}">date time</span>
+        </p>
+
+        <hr>
+
+        <h3>Message</h3>
+
+        <p th:text="${message.body}">message body</p>
+
+    </div>
 
 </body>
 

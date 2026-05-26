@@ -7,28 +7,51 @@
 
 <body>
 
-    <h1>Compose Message</h1>
+    <div th:replace="header :: header"></div>
 
-    <a href="/messages/inbox">Inbox</a> |
-    <a href="/messages/sent">Sent Messages</a> |
-    <a href="/">Home</a>
+    <div class="container mt-4">
 
-    <hr>
+        <div th:if="${successMessage}" style="color: green; font-weight: bold;">
+            <p th:text="${successMessage}">Message sent successfully!</p>
+        </div>
 
-    <form method="post" action="/messages/compose">
+        <div th:if="${errorMessage}" style="color: red; font-weight: bold;">
+            <p th:text="${errorMessage}">Error message</p>
+        </div>
 
-        <label>Receiver Username:</label><br>
-        <input type="text" name="receiverUsername" required><br><br>
+        <h1>Compose Message</h1>
 
-        <label>Subject:</label><br>
-        <input type="text" name="subject" required><br><br>
+        <p>
+            <a href="/messages/inbox">Inbox</a> |
+            <a href="/messages/sent">Sent Messages</a>
+        </p>
 
-        <label>Message:</label><br>
-        <textarea name="body" rows="8" cols="50" required></textarea><br><br>
+        <hr>
 
-        <button type="submit">Send Message</button>
+        <form method="post" th:action="@{/messages/compose}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-    </form>
+            <p>
+                <label for="receiverUsername"><strong>To Username:</strong></label><br>
+                <input type="text" id="receiverUsername" name="receiverUsername" placeholder="Enter receiver username"
+                    required>
+            </p>
+
+            <p>
+                <label for="subject"><strong>Subject:</strong></label><br>
+                <input type="text" id="subject" name="subject" placeholder="Enter message subject" required>
+            </p>
+
+            <p>
+                <label for="body"><strong>Message:</strong></label><br>
+                <textarea id="body" name="body" rows="8" cols="60" placeholder="Type your message here..."
+                    required></textarea>
+            </p>
+
+            <button type="submit">Send Message</button>
+        </form>
+
+    </div>
 
 </body>
 

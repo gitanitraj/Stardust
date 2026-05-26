@@ -7,35 +7,58 @@
 
 <body>
 
-    <h1>Sent Messages</h1>
+    <div th:replace="header :: header"></div>
 
-    <a href="/messages/inbox">Inbox</a> |
-    <a href="/messages/compose">Compose Message</a> |
-    <a href="/">Home</a>
+    <div class="container mt-4">
 
-    <hr>
+        <div th:if="${successMessage}" style="color: green; font-weight: bold;">
+            <p th:text="${successMessage}">Message sent successfully!</p>
+        </div>
 
-    <div th:if="${messages.isEmpty()}">
-        <p>You have not sent any messages yet.</p>
-    </div>
+        <div th:if="${errorMessage}" style="color: red; font-weight: bold;">
+            <p th:text="${errorMessage}">Error message</p>
+        </div>
 
-    <div th:each="message : ${messages}">
-        <p>
-            <strong>To:</strong>
-            <span th:text="${message.receiver.username}"></span>
-        </p>
+        <h1>Sent Messages</h1>
 
         <p>
-            <strong>Subject:</strong>
-            <a th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}"></a>
-        </p>
-
-        <p>
-            <strong>Sent:</strong>
-            <span th:text="${message.sentAt}"></span>
+            <a href="/messages/compose">Compose Message</a> |
+            <a href="/messages/inbox">Inbox</a> |
+            <a href="/messages/sent">Sent Messages</a>
         </p>
 
         <hr>
+
+        <div th:if="${messages == null || #lists.isEmpty(messages)}">
+            <p>No sent messages yet.</p>
+            <p>
+                <a href="/messages/compose">Write one now!</a>
+            </p>
+        </div>
+
+        <div th:if="${messages != null}" th:each="message : ${messages}">
+            <div>
+                <p>
+                    <strong>Subject:</strong>
+                    <a th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}">
+                        Subject
+                    </a>
+                </p>
+
+                <p>
+                    <strong>To:</strong>
+                    <span th:text="${message.receiver.username}">receiver</span>
+                </p>
+
+                <p>
+                    <strong>Sent:</strong>
+                    <span th:text="${message.sentAt}">date time</span>
+                </p>
+            </div>
+
+            <hr>
+        </div>
+
     </div>
 
 </body>
