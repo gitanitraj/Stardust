@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
 <body>
 <nav th:fragment="header" class="navbar navbar-dark forum-header">
     <div class="container">
@@ -16,21 +16,21 @@
                 <a class="nav-link text-white mr-3 d-inline"
                         th:href="@{/users/{username}(username=${#authentication.principal.username})}">
                         My Profile
-                </a>
-                <a class="nav-link text-white mr-3 d-inline"
-                        th:href="@{/settings/profile}">
+                    </a>
+                    <a class="nav-link text-white mr-3 d-inline" th:href="@{/settings/profile}">
                         Edit Profile
-                </a>
+                    </a>
 
-                <form th:action="@{/action_logout}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-link nav-link text-white d-inline p-0">Logout</button>
-                </form>
-            </span>
-            <span sec:authorize="!isAuthenticated()">
-                <a class="nav-link text-white d-inline" th:href="@{/loginform}">Login / Register</a>
-            </span>
+                    <form th:action="@{/action_logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-link nav-link text-white d-inline p-0">Logout</button>
+                    </form>
+                </span>
+                <span sec:authorize="!isAuthenticated()">
+                    <a class="nav-link text-white d-inline" th:href="@{/loginform}">Login / Register</a>
+                </span>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 </body>
+
 </html>

@@ -21,23 +21,42 @@ public class MessageService {
     }
 
     public List<Message> getInbox(User user) {
+        Objects.requireNonNull(user, "user cannot be null");
         return messageRepository.findByReceiverOrderBySentAtDesc(user);
     }
 
     public List<Message> getSentMessages(User user) {
+        Objects.requireNonNull(user, "user cannot be null");
         return messageRepository.findBySenderOrderBySentAtDesc(user);
     }
 
     public Message sendMessage(User sender, String receiverUsername, String subject, String body) {
-        User receiver = userRepository.findByUsername(receiverUsername)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Objects.requireNonNull(sender, "sender cannot be null");
 
-        Message message = new Message(subject, body, sender, receiver);
+        if (receiverUsername == null || receiverUsername.trim().isEmpty()) {
+            throw new RuntimeException("Receiver username cannot be empty");
+        }
+
+        if (subject == null || subject.trim().isEmpty()) {
+            throw new RuntimeException("Subject cannot be empty");
+        }
+
+        if (body == null || body.trim().isEmpty()) {
+            throw new RuntimeException("Message body cannot be empty");
+        }
+
+        User receiver = userRepository.findByUsername(receiverUsername.trim())
+                .orElseThrow(() -> new RuntimeException("User not found: " + receiverUsername));
+
+        Message message = new Message(subject.trim(), body.trim(), sender, receiver);
+
         return messageRepository.save(message);
     }
 
     public Message getMessageForUser(Long messageId, User currentUser) {
         Objects.requireNonNull(messageId, "messageId cannot be null");
+        Objects.requireNonNull(currentUser, "currentUser cannot be null");
+
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new RuntimeException("Message not found"));
 

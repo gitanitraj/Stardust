@@ -7,39 +7,54 @@
 
 <body>
 
-    <h1>Inbox</h1>
+    <div th:replace="header :: header"></div>
 
-    <a href="/messages/compose">Compose Message</a> |
-    <a href="/messages/sent">Sent Messages</a> |
-    <a href="/">Home</a>
+    <div class="container mt-4">
 
-    <hr>
-
-    <div th:if="${messages.isEmpty()}">
-        <p>No messages in your inbox.</p>
-    </div>
-
-    <div th:each="message : ${messages}">
-        <p>
-            <strong>From:</strong>
-            <span th:text="${message.sender.username}"></span>
-        </p>
+        <h1>Inbox</h1>
 
         <p>
-            <strong>Subject:</strong>
-            <a th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}"></a>
-        </p>
-
-        <p>
-            <strong>Sent:</strong>
-            <span th:text="${message.sentAt}"></span>
-        </p>
-
-        <p th:if="${!message.readStatus}">
-            <strong>Unread</strong>
+            <a href="/messages/compose">Compose Message</a> |
+            <a href="/messages/inbox">Inbox</a> |
+            <a href="/messages/sent">Sent Messages</a>
         </p>
 
         <hr>
+
+        <div th:if="${messages == null || #lists.isEmpty(messages)}">
+            <p>Your inbox is empty.</p>
+            <p>
+                <a href="/messages/compose">Send a message</a>
+            </p>
+        </div>
+
+        <div th:if="${messages != null}" th:each="message : ${messages}">
+            <div>
+                <p th:if="${message.readStatus == false}" style="color: green; font-weight: bold;">
+                    NEW
+                </p>
+
+                <p>
+                    <strong>Subject:</strong>
+                    <a th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}">
+                        Subject
+                    </a>
+                </p>
+
+                <p>
+                    <strong>From:</strong>
+                    <span th:text="${message.sender.username}">sender</span>
+                </p>
+
+                <p>
+                    <strong>Sent:</strong>
+                    <span th:text="${message.sentAt}">date time</span>
+                </p>
+            </div>
+
+            <hr>
+        </div>
+
     </div>
 
 </body>
