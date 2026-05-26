@@ -3,60 +3,148 @@
 
 <head>
     <title>Sent Messages</title>
+    <style>
+        body {
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .messages-container {
+            max-width: 950px;
+            margin: 40px auto;
+            padding: 25px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .message-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .message-nav a {
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #343a40;
+            color: white;
+            font-weight: bold;
+        }
+
+        .message-nav a:hover {
+            background: #0d6efd;
+        }
+
+        .success-box {
+            background: #d1e7dd;
+            color: #0f5132;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            color: #842029;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .empty-card,
+        .message-card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+        }
+
+        .message-card {
+            border-left: 5px solid #6f42c1;
+        }
+
+        .message-subject {
+            font-size: 20px;
+            font-weight: bold;
+            color: #6f42c1;
+            text-decoration: none;
+        }
+
+        .message-subject:hover {
+            text-decoration: underline;
+        }
+
+        .message-meta {
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .send-link {
+            color: #0d6efd;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
 </head>
 
 <body>
 
     <div th:replace="header :: header"></div>
 
-    <div class="container mt-4">
+    <div class="messages-container">
 
-        <div th:if="${successMessage}" style="color: green; font-weight: bold;">
-            <p th:text="${successMessage}">Message sent successfully!</p>
+        <div th:if="${successMessage}" class="success-box">
+            <span th:text="${successMessage}">Message sent successfully!</span>
         </div>
 
-        <div th:if="${errorMessage}" style="color: red; font-weight: bold;">
-            <p th:text="${errorMessage}">Error message</p>
+        <div th:if="${errorMessage}" class="error-box">
+            <span th:text="${errorMessage}">Error message</span>
         </div>
 
-        <h1>Sent Messages</h1>
+        <h1 class="page-title">Sent Messages</h1>
+        <p class="subtitle">Messages you sent to other users.</p>
 
-        <p>
-            <a href="/messages/compose">Compose Message</a> |
-            <a href="/messages/inbox">Inbox</a> |
-            <a href="/messages/sent">Sent Messages</a>
-        </p>
+        <div class="message-nav">
+            <a href="/messages/compose">Compose</a>
+            <a href="/messages/inbox">Inbox</a>
+            <a href="/messages/sent">Sent</a>
+        </div>
 
-        <hr>
-
-        <div th:if="${messages == null || #lists.isEmpty(messages)}">
-            <p>No sent messages yet.</p>
+        <div th:if="${messages == null || #lists.isEmpty(messages)}" class="empty-card">
+            <h3>No sent messages yet.</h3>
             <p>
-                <a href="/messages/compose">Write one now!</a>
+                Write your first message here:
+                <a class="send-link" href="/messages/compose">Compose message</a>
             </p>
         </div>
 
-        <div th:if="${messages != null}" th:each="message : ${messages}">
-            <div>
-                <p>
-                    <strong>Subject:</strong>
-                    <a th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}">
-                        Subject
-                    </a>
-                </p>
+        <div th:if="${messages != null}" th:each="message : ${messages}" class="message-card">
+            <a class="message-subject" th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}">
+                Subject
+            </a>
 
-                <p>
-                    <strong>To:</strong>
-                    <span th:text="${message.receiver.username}">receiver</span>
-                </p>
+            <p class="message-meta">
+                <strong>To:</strong>
+                <span th:text="${message.receiver.username}">receiver</span>
+            </p>
 
-                <p>
-                    <strong>Sent:</strong>
-                    <span th:text="${message.sentAt}">date time</span>
-                </p>
-            </div>
-
-            <hr>
+            <p class="message-meta">
+                <strong>Sent:</strong>
+                <span th:text="${message.sentAt}">date time</span>
+            </p>
         </div>
 
     </div>

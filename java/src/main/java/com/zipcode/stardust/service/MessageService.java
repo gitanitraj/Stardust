@@ -48,7 +48,20 @@ public class MessageService {
         User receiver = userRepository.findByUsername(receiverUsername.trim())
                 .orElseThrow(() -> new RuntimeException("User not found: " + receiverUsername));
 
-        Message message = new Message(subject.trim(), body.trim(), sender, receiver);
+        /*
+         * This prevents a user from sending a message to themselves.
+         * If you WANT to allow self-messages, delete this if block.
+         */
+        if (receiver.getId().equals(sender.getId())) {
+            throw new RuntimeException("You cannot send a message to yourself");
+        }
+
+        Message message = new Message(
+                subject.trim(),
+                body.trim(),
+                sender,
+                receiver
+        );
 
         return messageRepository.save(message);
     }

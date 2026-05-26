@@ -3,56 +3,136 @@
 
 <head>
     <title>Inbox</title>
+    <style>
+        body {
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .messages-container {
+            max-width: 950px;
+            margin: 40px auto;
+            padding: 25px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .message-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .message-nav a {
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #343a40;
+            color: white;
+            font-weight: bold;
+        }
+
+        .message-nav a:hover {
+            background: #0d6efd;
+        }
+
+        .empty-card,
+        .message-card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+        }
+
+        .message-card {
+            border-left: 5px solid #0d6efd;
+        }
+
+        .message-subject {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .message-subject:hover {
+            text-decoration: underline;
+        }
+
+        .message-meta {
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .badge-new {
+            background: #198754;
+            color: white;
+            padding: 4px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .send-link {
+            color: #0d6efd;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
 </head>
 
 <body>
 
     <div th:replace="header :: header"></div>
 
-    <div class="container mt-4">
+    <div class="messages-container">
 
-        <h1>Inbox</h1>
+        <h1 class="page-title">Inbox</h1>
+        <p class="subtitle">Messages you received from other users.</p>
 
-        <p>
-            <a href="/messages/compose">Compose Message</a> |
-            <a href="/messages/inbox">Inbox</a> |
-            <a href="/messages/sent">Sent Messages</a>
-        </p>
+        <div class="message-nav">
+            <a href="/messages/compose">Compose</a>
+            <a href="/messages/inbox">Inbox</a>
+            <a href="/messages/sent">Sent</a>
+        </div>
 
-        <hr>
-
-        <div th:if="${messages == null || #lists.isEmpty(messages)}">
-            <p>Your inbox is empty.</p>
+        <div th:if="${messages == null || #lists.isEmpty(messages)}" class="empty-card">
+            <h3>Your inbox is empty.</h3>
             <p>
-                <a href="/messages/compose">Send a message</a>
+                Start a conversation by sending a message.
+                <a class="send-link" href="/messages/compose">Send a message</a>
             </p>
         </div>
 
-        <div th:if="${messages != null}" th:each="message : ${messages}">
-            <div>
-                <p th:if="${message.readStatus == false}" style="color: green; font-weight: bold;">
-                    NEW
-                </p>
+        <div th:if="${messages != null}" th:each="message : ${messages}" class="message-card">
+            <p th:if="${message.readStatus == false}">
+                <span class="badge-new">NEW</span>
+            </p>
 
-                <p>
-                    <strong>Subject:</strong>
-                    <a th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}">
-                        Subject
-                    </a>
-                </p>
+            <a class="message-subject" th:href="@{/messages/{id}(id=${message.id})}" th:text="${message.subject}">
+                Subject
+            </a>
 
-                <p>
-                    <strong>From:</strong>
-                    <span th:text="${message.sender.username}">sender</span>
-                </p>
+            <p class="message-meta">
+                <strong>From:</strong>
+                <span th:text="${message.sender.username}">sender</span>
+            </p>
 
-                <p>
-                    <strong>Sent:</strong>
-                    <span th:text="${message.sentAt}">date time</span>
-                </p>
-            </div>
-
-            <hr>
+            <p class="message-meta">
+                <strong>Sent:</strong>
+                <span th:text="${message.sentAt}">date time</span>
+            </p>
         </div>
 
     </div>
