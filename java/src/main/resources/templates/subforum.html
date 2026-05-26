@@ -32,13 +32,11 @@
         <a th:each="post : ${posts}"
            th:href="@{/viewpost(post=${post.id})}"
            class="list-group-item list-group-item-action">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between align-items-center">
                 <strong th:text="${post.title}">Post Title</strong>
-                <small class="text-muted">
-                    <a th:href="@{'/users/' + ${post.user.username}}"
-                        th:text="${post.user.username}"
-                        class="text-white font-weight-bold"></a>
-                    by <span th:text="${post.user.username}">author</span>
+                <small class="post-meta text-nowrap ml-3">
+                    by <span th:text="${post.user.username}" class="font-weight-bold">author</span>
+                    &mdash; <span th:text="${post.timeString}">time</span>
                 </small>
             </div>
         </a>
