@@ -18,6 +18,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "\"user\"")
@@ -48,9 +49,11 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Reaction> reactions = new ArrayList<>();
 
+    @Size(max = 50, message = "Display name must be 50 characters or fewer.")
     @Column(nullable = true, length = 50)
     private String displayName;
 
+    @Size(max = 500, message = "Bio must be 500 characters or fewer.")
     @Column(nullable = true, length = 500)
     private String bio;
 
