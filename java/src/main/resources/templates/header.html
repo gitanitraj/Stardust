@@ -4,33 +4,40 @@
 <body>
 <nav th:fragment="header" class="navbar navbar-dark forum-header">
     <div class="container">
-        <a class="navbar-brand" th:href="@{/}" th:text="${siteName}">Schooner</a>
-        <div class="navbar-nav flex-row">
-            <a class="nav-link text-white mr-3" th:href="@{/}">Subforum Index</a>
-            <span sec:authorize="isAuthenticated()">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
+            <img src="/logo.png" alt="logo" height="32" class="mr-2"
+                 style="filter: brightness(0) invert(1);" onerror="this.style.display='none'"/>
+            <span th:text="${siteName} ?: 'Schooner'">Schooner</span>
+        </a>
+        <div class="d-flex flex-row align-items-center">
+            <a class="nav-link text-white mr-2" th:href="@{/}">Forum Index</a>
+            <div sec:authorize="isAuthenticated()" class="d-flex flex-row align-items-center">
+                <img th:if="${#authentication.principal.avatarUrl != null}"
+                     th:src="${#authentication.principal.avatarUrl}"
+                     class="avatar avatar-xs mr-2"
+                     alt="avatar"/>
+                <span th:unless="${#authentication.principal.avatarUrl != null}"
+                      class="avatar-placeholder avatar-xs mr-2"
+                      th:text="${#authentication.principal.username.substring(0,1).toUpperCase()}">U</span>
                 <span class="text-white mr-2"
-                    th:text="'Hello, ' + ${#authentication.principal.displayName}">
-                    Hello, user
+                      th:text="${#authentication.principal.displayName != null and !#authentication.principal.displayName.isEmpty()} ? ${#authentication.principal.displayName} : ${#authentication.principal.username}">
+                    user
                 </span>
-
-                <a class="nav-link text-white mr-3 d-inline"
-                        th:href="@{/users/{username}(username=${#authentication.principal.username})}">
-                        My Profile
-                    </a>
-                    <a class="nav-link text-white mr-3 d-inline" th:href="@{/settings/profile}">
-                        Edit Profile
-                    </a>
-
-                    <form th:action="@{/action_logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-link nav-link text-white d-inline p-0">Logout</button>
-                    </form>
-                </span>
-                <span sec:authorize="!isAuthenticated()">
-                    <a class="nav-link text-white d-inline" th:href="@{/loginform}">Login / Register</a>
-                </span>
+                <a class="nav-link text-white mr-2" th:href="@{/messages}">Messages</a>
+                <a class="nav-link text-white mr-2"
+                   th:href="@{/users/{u}(u=${#authentication.principal.username})}">Profile</a>
+                <a class="nav-link text-white mr-2"
+                   th:href="@{/settings/profile}">Settings</a>
+                <form th:action="@{/action_logout}" method="post" class="d-flex align-items-center">
+                    <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                </form>
+            </div>
+            <div sec:authorize="!isAuthenticated()" class="d-flex align-items-center">
+                <a class="nav-link text-white" th:href="@{/loginform}">Login / Register</a>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 </body>
 
 </html>

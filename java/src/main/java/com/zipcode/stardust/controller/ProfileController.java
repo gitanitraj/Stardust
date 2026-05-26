@@ -2,11 +2,13 @@ package com.zipcode.stardust.controller;
 
 import java.security.Principal;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,10 +25,22 @@ public class ProfileController {
     private final ProfileService profileService;
     private final UserRepository userRepository;
 
+    @Value("${site.name:Schooner}")
+    private String siteName;
+
+    @Value("${site.description:a schooner forum}")
+    private String siteDescription;
+
     public ProfileController(UserRepository userRepository,
                              ProfileService profileService) {
         this.userRepository = userRepository;
         this.profileService = profileService;
+    }
+
+    @ModelAttribute
+    public void addSiteAttributes(Model model) {
+        model.addAttribute("siteName", siteName);
+        model.addAttribute("siteDescription", siteDescription);
     }
 
     // GET /users/{username}
